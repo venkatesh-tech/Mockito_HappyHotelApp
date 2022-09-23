@@ -3,12 +3,10 @@ package com.mockitotutorial.happyhotel.booking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.*;
 //import org.mockito.Mock;
 
-class Test01FirstMocks {
+class Test02DefaultReturnValues {
 
 	// Main Class
 	private BookingService bookingService;
@@ -23,27 +21,30 @@ class Test01FirstMocks {
 	void setup() {
 
 		this.paymentServiceMock = mock(PaymentService.class); // gives a dummy payment service
-		this.roomServiceMock = mock(RoomService.class); // @Mock can also be used like
+		this.roomServiceMock = mock(RoomService.class); // @Mock can also be used
 		this.bookingDAOMock = mock(BookingDAO.class);
 		this.mailSenderMock = mock(MailSender.class);
 
 		bookingService = new BookingService(paymentServiceMock, roomServiceMock, bookingDAOMock, mailSenderMock);
+
+		// nice mocks returned values
+		System.out.println("List Returned " + roomServiceMock.getAvailableRooms()); // 1. empty list
+		System.out.println("Objects returned " + roomServiceMock.findAvailableRoomId(null)); // 2. null object
+		System.out.println("primitive returned " + roomServiceMock.getRoomCount()); // 3. false primitives
 	}
 
 	@Test
-	void should_CalculateCorrectPrice_When_CorrectInput() {
-
+	void should_CountAvaliablePlaces() {
 		// given
-		BookingRequest bookingRequest = new BookingRequest("1", LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 5), 2,
-				false);
-		double expected = 4 * 2 * 50.0;
+		int expected = 0; // nice mocks will return a empty list because getAvailablePlaceCount will take
+							// getAvailableRooms and getAvailableRooms will return empty list
 
 		// when
-		double actual = bookingService.calculatePrice(bookingRequest); // It doesn't use any dependencies to calculate
-																		// price
+
+		int actual = bookingService.getAvailablePlaceCount();
+
 		// then
 		assertEquals(expected, actual);
-
 	}
 
 }
