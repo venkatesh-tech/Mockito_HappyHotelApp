@@ -1,7 +1,8 @@
 package com.mockitotutorial.happyhotel.booking;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.Mockito.mockStatic;
 
 import java.time.LocalDate;
 
@@ -37,19 +38,19 @@ class Test14StaticMethods {
 	private ArgumentCaptor<BookingRequest> bookingRequestCaptor;
 
 	@Test
-	void should_InvokePayemnt_When_Prepaid() {
+	void should_CalculateCorrectPrice() {
+		try (MockedStatic<CurrencyConverter> mockedConverter = mockStatic(CurrencyConverter.class)) {
+			// given
+			BookingRequest bookingRequest = new BookingRequest("1", LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 5),
+					2, false);
+			double expected = 400.0;
+			mockedConverter.when(() -> CurrencyConverter.toEuro(anyDouble())).thenReturn(400.0);
 
-		// given
-		BookingRequest bookingRequest = new BookingRequest("1", LocalDate.of(2020, 1, 1), LocalDate.of(2020, 1, 5), 2,
-				false);
-		lenient().when(paymentServiceMock.pay(any(), anyDouble())).thenReturn("1"); // Unecessary stubbing behaviour
-		// Strict Stubbing
+			// when
+			double actual = bookingService.calculatePriceEuro(bookingRequest);
+			// then
+			assertEquals(expected, actual);
+		}
 
-		// when
-
-		bookingService.makeBooking(bookingRequest);
-
-		// then
-		// No exception is thrown
 	}
 }
